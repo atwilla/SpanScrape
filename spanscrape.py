@@ -3,7 +3,20 @@ import requests
 import sys
 import urllib3
 
-word = sys.argv[1]
+verbose = False
+
+if "-v" in sys.argv:
+	vIndex = sys.argv.index("-v")
+
+	if vIndex == 1:
+		word = ' '.join(sys.argv[2:])
+	else:
+		word = ' '.join(sys.argv[1:vIndex])
+else:
+	word = ' '.join(sys.argv[1:])
+
+print(word)
+
 url = "https://spanishdict.com/translate/"
 
 try:
