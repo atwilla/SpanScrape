@@ -28,25 +28,37 @@ try:
 		headers = soup.find_all("div", class_="entry--3tNUi")[:-1]
 		transBlocks = []
 
-		for header in headers:
-			transBlocks += header.find_next_siblings("div")
-		
-		for block in transBlocks:
-			# Print word type.
-			print(block.contents[0].find("a").text)
+		try:
 
-			# All translation text save for title found in contents[1].
-			translations = block.contents[1].contents
+			for header in headers:
+				transBlocks += header.find_next_siblings("div")
+			
+			for block in transBlocks:
+				# Print word type.
+				print(block.contents[0].find("a").text)
 
-			for trans in translations:
-				# Print word summary.
-				print("\t" + trans.contents[0].text)
-				
-				transDiv = trans.contents[1].contents[0]
-				neoDictTrans = transDiv.find("a", 
-					class_="neodictTranslation--C2TP2")
-				print("\t\t" + neoDictTrans.text)	
+				# All translation text save for title found in contents[1].
+				translations = block.contents[1].contents
 
+				for trans in translations:
+					# Print word summary.
+					sumSpans = trans.contents[0].find_all("span")
+					sumTxt = ""
+
+					for span in sumSpans:
+						sumTxt += span.text
+
+					print("\t" + sumTxt)
+					
+					transDiv = trans.contents[1].contents[0]
+					neoDictTrans = transDiv.find("a", 
+						class_="neodictTranslation--C2TP2")
+					print("\t\t" + neoDictTrans.text)	
+
+				print("")
+
+		except AttributeError:
+				pass
 	else:
 		divList = soup.find_all("div", class_="inline--1nnau")[1:]
 		defList = []
