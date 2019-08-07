@@ -16,6 +16,32 @@ if "-v" in sys.argv:
 else:
 	word = ' '.join(sys.argv[1:])
 
+def printIndent(numTabs, text, charLim=80, tabLen=4):
+	"""Print a large string with a consistent indentation without exceeding 
+	   the specified char limit.
+	"""
+
+	tabs = ""
+
+	for tab in range(numTabs):
+		tabs += " " * tabLen
+
+	words = [word + " " for word in text.split(" ")]
+	words[-1] = words[-1][:-1]
+
+	currLine = tabs
+
+	for word in words:
+		
+		if len(currLine + word) <= charLim:
+			currLine += word
+		else:
+			print(currLine)
+			currLine = tabs + word
+
+	if currLine != tabs:
+		print(currLine)
+
 def spanScrape(word, verbose=False):
 	url = "https://spanishdict.com/translate/"
 	
@@ -34,7 +60,7 @@ def spanScrape(word, verbose=False):
 				
 				for block in transBlocks:
 					# Print word type.
-					print(block.contents[0].find("a").text)
+					print(block.contents[0].find("a").text + "\n")
 	
 					# All translation text save for title found in contents[1].
 					translations = block.contents[1].contents
@@ -47,17 +73,15 @@ def spanScrape(word, verbose=False):
 						for span in sumSpans:
 							sumTxt += span.text
 	
-						print("\t" + sumTxt)
+						printIndent(1, sumTxt + "\n")
 						
 						transDiv = trans.contents[1].contents[0]
 						neoDictTrans = transDiv.find("a", 
-							class_="neodictTranslation--C2TP2")
-						print("\t\t" + neoDictTrans.text)	
+							class_="neodictTranslation--C2TP2").text
+						printIndent(2, neoDictTrans + "\n")	
 						exSentence = transDiv.find("div", 
 							class_="indent--FyTYr").contents[0].text
-						print("\t\t\t" + exSentence + "\n")
-	
-					print("")
+						printIndent(3, exSentence + "\n")
 	
 			except AttributeError:
 					pass
