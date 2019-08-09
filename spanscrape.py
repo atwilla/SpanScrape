@@ -16,6 +16,7 @@ if "-v" in sys.argv:
 else:
 	word = ' '.join(sys.argv[1:])
 
+
 def printIndent(numTabs, text, charLim=80, tabLen=4):
 	"""Print a large string with a consistent indentation without exceeding 
 	   the specified char limit.
@@ -42,6 +43,7 @@ def printIndent(numTabs, text, charLim=80, tabLen=4):
 	if currLine != tabs:
 		print(currLine)
 
+
 def spanScrape(word, verbose=False):
 	url = "https://spanishdict.com/translate/"
 	
@@ -50,7 +52,8 @@ def spanScrape(word, verbose=False):
 		soup = BS(page.text, 'html.parser')
 	
 		if verbose:
-			headers = soup.find_all("div", class_="entry--3tNUi")[:-1]
+			headers = soup.find_all("div", class_="entry--3tNUi")
+			transTag = "neodictTranslation--C2TP2"
 			transBlocks = []
 	
 			try:
@@ -59,32 +62,40 @@ def spanScrape(word, verbose=False):
 					transBlocks += header.find_next_siblings("div")
 				
 				for block in transBlocks:
-					# Print word type.
-					print(block.contents[0].find("a").text + "\n")
 	
 					# All translation text save for title found in contents[1].
 					translations = block.contents[1].contents
+
+					# Check last translation for completeness. Trigger 
+					# exception if incomplete to prevent printing a 
+					# partial translation.
+					lastTrans = translations[-1].contents[1].contents[0]
+					lastTrans.find("a", class_=transTag).text
+
+					wordType = block.contents[0].find("a").text
+					print(wordType + "\n")
 	
 					for trans in translations:
-						# Print word summary.
-						sumSpans = trans.contents[0].find_all("span")
-						sumTxt = ""
+						# Print word tags.
+						tagSpans = trans.contents[0].find_all("span")
+						tagTxt = ""
 	
-						for span in sumSpans:
-							sumTxt += span.text
+						for span in tagSpans:
+							tagTxt += span.text
 	
-						printIndent(1, sumTxt + "\n")
+						printIndent(1, tagTxt + "\n")
 						
 						transDiv = trans.contents[1].contents[0]
 						neoDictTrans = transDiv.find("a", 
-							class_="neodictTranslation--C2TP2").text
+							class_=transTag).text
 						printIndent(2, neoDictTrans + "\n")	
 						exSentence = transDiv.find("div", 
 							class_="indent--FyTYr").contents[0].text
 						printIndent(3, exSentence + "\n")
 	
 			except AttributeError:
-					pass
+				pass
+
 		else:
 			divList = soup.find_all("div", class_="inline--1nnau")[1:]
 			defList = []
