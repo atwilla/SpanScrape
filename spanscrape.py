@@ -85,13 +85,17 @@ def spanScrape(word, verbose=False):
 	
 						printIndent(1, tagTxt + "\n")
 						
-						transDiv = trans.contents[1].contents[0]
-						neoDictTrans = transDiv.find("a", 
-							class_=transTag).text
-						printIndent(2, neoDictTrans + "\n")	
-						exSentence = transDiv.find("div", 
-							class_="indent--FyTYr").contents[0].text
-						printIndent(3, exSentence + "\n")
+						transDiv = trans.contents[1]
+
+						neoDictTrans = [x.text for x in transDiv.find_all("a", 
+							recursive=True, class_=transTag)]
+
+						exSentences = [sentence.text for sentence in 
+							transDiv.find_all("div", class_="indent--FyTYr")]
+
+						for neoDict, sentence in zip(neoDictTrans, exSentences):
+							printIndent(2, neoDict + "\n")	
+							printIndent(3, sentence + "\n")
 	
 			except AttributeError:
 				pass
