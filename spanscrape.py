@@ -54,14 +54,14 @@ def spanScrape(word, verbose=False):
 		if verbose:
 			headers = soup.find_all("div", class_="entry--3tNUi")
 			transTag = "neodictTranslation--C2TP2"
-			transBlocks = []
+			contentBlocks = []
 	
 			try:
 	
 				for header in headers:
-					transBlocks += header.find_next_siblings("div")
+					contentBlocks += header.find_next_siblings("div")
 				
-				for block in transBlocks:
+				for block in contentBlocks:
 	
 					# All translation text save for title found in contents[1].
 					translations = block.contents[1].contents
@@ -85,6 +85,7 @@ def spanScrape(word, verbose=False):
 	
 						printIndent(1, tagTxt + "\n")
 						
+						# transDiv holds translated words and example sentences.
 						transDiv = trans.contents[1]
 
 						neoDictTrans = [x.text for x in transDiv.find_all("a", 
@@ -102,12 +103,12 @@ def spanScrape(word, verbose=False):
 
 		else:
 			divList = soup.find_all("div", class_="inline--1nnau")[1:]
-			defList = []
+			transList = []
 	
 			for div in divList:
-				defList.append(div.contents[0].text)
+				transList.append(div.contents[0].text)
 	
-			if len(defList) == 0:
+			if len(transList) == 0:
 				print("No translation found.")
 	
 			else:
